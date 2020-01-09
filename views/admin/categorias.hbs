@@ -1,0 +1,15 @@
+<h2>Nova Categoria</h2>
+<hr>
+<a href="/admin/categorias/add"<button class="btn btn-success">Incluir Categoria</button></a>
+{{#each categorias}}
+    <dev class="card mt-4" >
+        <div class="body-card">
+            <h4>{{nome}}</h4>
+            <small>{{slug}}</small><br>
+           <a href="/categorias/edit/{{id}}"> <button class="btn btn-success">Editar categoria</button></a>
+        </div>
+
+
+    </dev>
+{{else}}
+{{/each}}

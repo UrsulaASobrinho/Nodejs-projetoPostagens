@@ -1,15 +1,39 @@
 'use strict'
 //Mdulos
-    const express = require('express');
-    const handlebars = require('express-handlebars');
-    const bodyParser = require('body-parser');
-    //const mongoose = require('mongoose');
+    const express = require('express')
+    const handlebars = require('express-handlebars')
+    const bodyParser = require('body-parser')
+    const mongoose = require('mongoose')
 
-    const app = express();
-    const admin = require("./router/admin");
-    const path = require('path');
+    //importando modulos de session
+    const session = require('express-session')
+    const flash = require('connect-flash')
+
+
+    const app = express()
+    const admin = require("./router/admin") //jogando o aqruivos admin para dentro do app
+    const path = require('path')
 
 //Configurações
+
+    // Configuração das sessões
+    app.use(session({
+        // Chave para gerar uma sessão 
+        secret: 'root',
+        resave: true,
+        saveUninitialized: true
+    }));
+// Configuração da sessão flash
+    app.use(flash());
+// Middleware
+    app.use((req, res, next) => {
+        // Comando 'locals' para criar variaveis globais
+        res.locals.success_msg = req.flash('success_msg');
+        res.locals.error_msg = req.flash('error_msg');
+        // Comando 'next();' para permitir que as rotas avancem apos passarem no mdidleware
+        next();
+    });
+
     //bodyParser
     app.use(bodyParser.urlencoded({extended: true}))
     app.use(bodyParser.json());
@@ -23,6 +47,12 @@
         extname: '.hbs'
     }));
     app.set('view engine', '.hbs');
+
+    //Mongoose
+    mongoose.Promise = global.Promise
+    mongoose.connect("mongodb://localhost/pagedb").then(()=>{
+        console.log("Conectato ao mondodb")
+    }).catch((err)=>{     console.log(err);    })
    
     //public - informa que todos os arquivos estaticos estão nesta pasta
     app.use(express.static(path.join(__dirname, "public")));
@@ -30,11 +60,10 @@
 
 //Rotas
     //HomePage
-    app.use('/', (req , res) =>{
-        res.render("index");
+    app.get('/', (req, res) =>{
+        res.send('rota principal')
     })
-
-    app.use('/admin',admin);
+    app.use('/admin', admin);
 
 //Outros
 const PORTA = 8081
